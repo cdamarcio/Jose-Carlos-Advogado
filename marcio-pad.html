@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PARECER REVISIONAL & DASHBOARD DE AUDITORIA DISCIPLINAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #040711;
+            --bg-surface: #091126;
+            --bg-surface-hover: #101d3d;
+            --border-color: rgba(255, 255, 255, 0.06);
+            
+            --gold-primary: #e0a32e;
+            --gold-light: #fde047;
+            --gold-dark: #854d0e;
+            
+            --red-primary: #f43f5e;
+            --red-light: #ffe4e6;
+            --red-dark: #881337;
+            
+            --green-primary: #10b981;
+            --green-light: #d1fae5;
+            --green-dark: #064e3b;
+            
+            --blue-primary: #3b82f6;
+            --blue-light: #dbeafe;
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 8px;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --font-serif: 'Cinzel', serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .glow-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(224, 163, 46, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(244, 63, 94, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .supreme-header {
+            text-align: center;
+            background: linear-gradient(135deg, #0b1a3c 0%, #050b1e 100%);
+            border: 1px solid var(--border-color);
+            padding: 60px 40px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .supreme-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--red-primary), var(--gold-primary), var(--blue-primary));
+        }
+
+        .badge-executive {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(224, 163, 46, 0.1);
+            border: 1px solid rgba(224, 163, 46, 0.25);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold-light);
+            margin-bottom: 24px;
+        }
+
+        .supreme-header h1 {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .supreme-header .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .meta-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        .meta-pill {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .meta-pill:hover {
+            border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+            background: var(--bg-surface-hover);
+        }
+
+        .meta-pill .label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .meta-pill .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .legal-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 45px;
+            box-shadow: var(--shadow);
+            margin-bottom: 35px;
+        }
+
+        h2.section-title {
+            font-family: var(--font-serif);
+            font-size: 1.4rem;
+            color: var(--gold-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        h3.subsection-title {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin: 24px 0 12px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        p.narrative-p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            text-align: justify;
+            margin-bottom: 20px;
+            text-indent: 2em;
+        }
+
+        p.narrative-p strong {
+            color: var(--text-primary);
+        }
+
+        .premium-callout {
+            background: linear-gradient(135deg, #1f1a14 0%, #140e06 100%);
+            border-left: 4px solid var(--gold-primary);
+            padding: 24px;
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            margin: 30px 0;
+        }
+
+        .premium-callout h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .premium-callout p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin: 0;
+            text-align: justify;
+        }
+
+        .flow-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            margin-bottom: 35px;
+        }
+
+        .modern-timeline {
+            position: relative;
+            margin: 20px 0;
+            padding-left: 30px;
+            border-left: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .timeline-node {
+            position: relative;
+            margin-bottom: 35px;
+        }
+
+        .timeline-node:last-child { margin-bottom: 0; }
+
+        .timeline-indicator {
+            position: absolute;
+            left: -41px;
+            top: 4px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--bg-main);
+            border: 4px solid var(--blue-primary);
+        }
+
+        .timeline-node.danger .timeline-indicator { border-color: var(--red-primary); }
+        .timeline-node.warning .timeline-indicator { border-color: var(--gold-primary); }
+        .timeline-node.success .timeline-indicator { border-color: var(--green-primary); }
+
+        .timeline-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .timeline-date {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .timeline-tag {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .tag-danger { background: rgba(244, 63, 94, 0.1); color: #fca5a5; }
+        .tag-warning { background: rgba(224, 163, 46, 0.1); color: var(--gold-light); }
+        .tag-blue { background: rgba(59, 130, 246, 0.1); color: #93c5fd; }
+        .tag-success { background: rgba(16, 185, 129, 0.1); color: #86efac; }
+
+        .timeline-content-box {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: var(--radius-md);
+        }
+
+        .timeline-content-box h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .timeline-content-box p {
+            font-size: 0.92rem;
+            color: var(--text-secondary);
+            margin: 0;
+            text-align: justify;
+        }
+
+        .dashboard-section {
+            background: linear-gradient(135deg, #070e1e 0%, #030612 100%);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 45px;
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .dash-card {
+            background: rgba(9, 17, 38, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .dash-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.25);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        }
+
+        .dash-card-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radial-gauge-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .radial-gauge {
+            width: 160px;
+            height: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-arc-bg {
+            width: 160px;
+            height: 160px;
+            border: 18px solid #111c38;
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 0;
+        }
+
+        .gauge-arc-fill {
+            width: 160px;
+            height: 160px;
+            border: 18px solid transparent;
+            border-top-color: var(--red-primary);
+            border-right-color: var(--red-primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 0; left: 0;
+            transform: rotate(45deg);
+        }
+
+        .gauge-meta-value {
+            text-align: center;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 10px;
+            font-family: var(--font-mono);
+        }
+
+        .metric-row { margin-bottom: 18px; }
+        .metric-row:last-child { margin-bottom: 0; }
+
+        .metric-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+        }
+
+        .metric-label { font-weight: 500; color: var(--text-secondary); }
+        .metric-pct { font-weight: 700; font-family: var(--font-mono); }
+
+        .metric-progress-bar {
+            height: 8px;
+            background: #111c38;
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .metric-progress-fill { height: 100%; border-radius: 100px; }
+
+        .dashboard-footer-grid {
+            display: grid;
+            grid-template-columns: 1.7fr 1.3fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .list-panel {
+            background: rgba(9, 17, 38, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+        }
+
+        .pill-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .pill-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateX(4px);
+        }
+
+        .pill-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .pill-item.danger-border { border-left: 3px solid var(--red-primary); }
+        .pill-item.warning-border { border-left: 3px solid var(--gold-primary); }
+        .pill-item.success-border { border-left: 3px solid var(--green-primary); }
+
+        .pill-item.danger-border .pill-number { background: var(--red-dark); color: #fca5a5; }
+        .pill-item.warning-border .pill-number { background: var(--gold-dark); color: var(--gold-light); }
+        .pill-item.success-border .pill-number { background: var(--green-dark); color: #86efac; }
+
+        .pill-text h5 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .pill-text p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+        }
+
+        .legend-left { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text-secondary); }
+        .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+        .legend-right { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+
+        .signature-block { margin-top: 60px; text-align: center; }
+        .signature-line { width: 220px; height: 1px; background: var(--border-color); margin: 0 auto 12px auto; }
+        .signature-title { font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-primary); }
+        .signature-sub { font-size: 0.85rem; color: var(--text-muted); }
+
+        ol.styled-list { margin: 15px 0; padding-left: 20px; }
+        ol.styled-list li { margin-bottom: 10px; padding-left: 5px; color: var(--text-secondary); }
+        ol.styled-list li strong { color: var(--text-primary); }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .law-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.92rem;
+        }
+
+        .law-table th {
+            background-color: #111c38;
+            color: var(--text-primary);
+            padding: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .law-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            vertical-align: top;
+        }
+
+        .law-table tr:hover td {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        @media (max-width: 1024px) {
+            .meta-container, .dashboard-grid, .dashboard-footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glow-backdrop"></div>
+
+    <div class="wrapper">
+        <header class="supreme-header">
+            <div class="badge-executive"><i class="fas fa-balance-scale"></i> Advocacia Pública Extraordinária</div>
+            <h1>Parecer Técnico-Jurídico Revisional</h1>
+            <div class="subtitle">Auditoria de Nulidades Absolutas, Impedimento por Parentesco, Falso Testemunho e Responsabilização das Comissões</div>
+        </header>
+
+        <section class="meta-container">
+            <div class="meta-pill">
+                <span class="label">Defendente / Interessado</span>
+                <span class="value">Márcio Rodrigues de Oliveira</span>
+            </div>
+            <div class="meta-pill">
+                <span class="label">Cargo Concursado Nomeado</span>
+                <span class="value">Analista de Sistemas (Desde 11/06/2012)</span>
+            </div>
+            <div class="meta-pill">
+                <span class="label">Inquérito de Origem</span>
+                <span class="value">PAD nº 0132/2022</span>
+            </div>
+            <div class="meta-pill">
+                <span class="label">Regime Disciplinar</span>
+                <span class="value">Lei Complementar nº 003/1993</span>
+            </div>
+        </section>
+
+        <div class="content-layout">
+            <article class="legal-panel">
+                <h2 class="section-title"><i class="fas fa-bullhorn"></i> I. A Gênese Real: O Ativismo Social e a Retaliação do Poder</h2>
+                <p class="narrative-p">
+                    O exame analítico, cruzado e independente dos elementos de convicção que instruem os autos revela que o Processo Administrativo Disciplinar nº 0132/2022 ultrapassa os limites regulares do poder sancionador do Estado. Revela-se, em verdade, como um gravíssimo expediente de <strong>retaliação política e assédio moral estrutural</strong>. O inquérito administrativo foi aparelhado com o objetivo explícito de calar o servidor Márcio Rodrigues de Oliveira, <strong>Analista de Sistemas concursado e estável desde 11/06/2012</strong>, devido à sua histórica e legítima atuação em defesa dos direitos dos servidores municipais e dos moradores de Conceição do Araguaia. O defendente consolidou-se na comarca como uma voz fiscalizatória ativa, denunciando irregularidades na infraestrutura e na gestão municipal através de vídeos, fotografias e matérias jornalísticas veiculadas em suas redes sociais e páginas oficiais desde julho de 2025.
+                </p>
+                <p class="narrative-p">
+                    A matriz persecutória eclodiu em <strong>julho de 2022</strong>, quando o vereador <strong>Sharles Peixoto</strong> publicou uma matéria em suas mídias sociais denunciando o então Prefeito Jair Martins por suposto superfaturamento e esquemas de corrupção nos contratos públicos vinculados ao evento <strong>FestVerão</strong>. Cumprindo seu papel cívico, Márcio inseriu a matéria no status privado de seu WhatsApp. Por meio de capturas de tela (*prints*) obtidas clandestinamente por terceiros — uma vez que o servidor já havia bloqueado preventivamente o acesso de seus superiores —, o então Prefeito tomou conhecimento do compartilhamento. Em manifesto descontrole e desvio de poder, o gestor telefonou diretamente para a pessoa mais próxima a Márcio (amiga pessoal e professora da Secretaria Municipal de Educação - SEMEC), desferindo ameaças severas e intimidatórias contra a integridade funcional do Analista.
+                </p>
+                
+                <h3 class="subsection-title"><i class="fas fa-user-shield"></i> II. O Aparelhamento Técnico das Férias, o Falso Atrito e o Depoimento Policial de Marcos</h3>
+                <p class="narrative-p">
+                    Imediatamente após o incidente político, o setor de Recursos Humanos deu início a uma fiscalização atípica sobre os direitos funcionais de Márcio. Sob o pretexto de férias coletivas na sede administrativa no mês de julho, o Analista solicitou formalmente a postergação de seu período de descanso. O pleito foi negado pelo servidor do RH, Marcos, sem qualquer fundamentação jurídica ou escrita, configurando manifesto tratamento discriminatório, visto que <strong>outros servidores em idêntica situação funcional receberam a concessão de adiamento de férias</strong>. Após firme e fundamentada resistência do Analista, a Administração cedeu, garantindo a permanência do servidor em atividade.
+                </p>
+                <p class="narrative-p">
+                    Dias após o impasse, o servidor do RH, Marcos, abordou o Analista no espaço reservado da cozinha da SEMEC. No local, travou-se um desentendimento verbal de natureza estritamente administrativa, <strong>sem qualquer espécie de agressão física ou verbal por parte de Márcio</strong>. Agindo com nítido desvio de finalidade, a máquina pública instrumentalizou esse fato isolado para forjar uma falta funcional gravíssima, instaurando a Portaria nº 0132/2022 em 21 de julho de 2022.
+                </p>
+                <p class="narrative-p">
+                    A completa ausência de justa causa material e a simulação fraudulenta do pretexto punitivo restaram cabalmente comprovadas pelos desdobramentos na esfera policial. Conforme consta expressamente no termo de declarações do <strong>Boletim de Ocorrência nº 00056/2022.101564-1</strong>, lavrado após o incidente, o servidor do RH, Marcos, compareceu perante a Delegacia de Polícia Civil de Conceição do Araguaia e prestou depoimento formal. No encerramento de sua oitiva judicializada, Marcos reconheceu que o atrito limitou-se ao campo profissional, informou que o investigado o procurou posteriormente para sanar o mal-entendido e <strong>declarou de forma peremptória que NÃO DESEJAVA SEGUIR CRIMINALMENTE contra Márcio</strong>, renunciando expressamente ao direito de representação. Sob a ótica do Direito Administrativo Sancionador, se a própria pretensa vítima afasta a subsistência de dolo, lesividade ou crime, a transmutação desse fato pela Administração em infração demissória configura flagrante abuso de autoridade.
+                </p>
+
+                <div class="premium-callout">
+                    <h4>Assédio Permanente e Confinamento Funcional em Ócio Forçado</h4>
+                    <p>Como ápice do processo de assédio moral continuado, a Comissão Processante (CPAD) aplicou uma suspensão preventiva de 30 dias contra Márcio. No entanto, a verdadeira violência institucional consolidou-se no momento de seu retorno: o Analista de Sistemas foi <strong>desalojado sumariamente de seu posto de trabalho na sala da Diretoria de Tecnologia da Informação (DTI)</strong> e confinado em uma sala em frente. O servidor permanece <strong>isolado em ócio forçado até a presente data, impedido de exercer suas funções privativas de Analista</strong>, enquanto um servidor cedido de outra secretaria executa suas tarefas originárias de forma totalmente irregular.</p>
+                </div>
+
+                <h2 class="section-title"><i class="fas fa-gavel"></i> III. Nulidades Categoriais de Pleno Direito e a Gravíssima Quebra de Impessoalidade</h2>
+                
+                <h3>1. Impedimento por Vínculo de Consanguinidade na Comissão (Caso Neliton vs. Nikole)</h3>
+                <p class="narrative-p">
+                    A análise estrutural dos componentes da CPAD designados na portaria inaugural de 2022 desvela um vício de parcialidade subjetiva imune a qualquer tentativa de convalidação. O servidor <strong>Neliton dos Santos Pereira</strong> (Matrícula nº 1737) foi nomeado como membro fixo da comissão processante encarregada de apurar e julgar as condutas atribuídas a Márcio. Ocorre que a própria irmã consanguínea do referido julgador, a Sra. <strong>Nikole</strong>, ocupante de cargo de chefia na estrutura da SEMEC, foi arrolada e atuou diretamente como <strong>testemunha de acusação contra o investigado</strong>.
+                </p>
+                <p class="narrative-p">
+                    Como agravante factual incontroverso, Márcio e Nikole ostentam um histórico público e notório de profunda **animosidade e ausência completa de convivência laboral e social**, não se falando no ambiente de trabalho ou em qualquer outro local do município. A presença do irmão de uma testemunha inimiga íntima do acusado na condição de julgador viola de forma mortal os artigos 137 e 138 da Lei Complementar nº 003/1993, combinados com o princípio da impessoalidade e do devido processo legal. O julgador Neliton atuou sob flagrante **impedimento legal absoluto**, contaminando de nulidade insanável todos os atos instrutórios e relatórios emitidos pela comissão de 2022.
+                </p>
+
+                <h3>2. Epidemia de Falso Testemunho e Ausência de Testemunhas Oculares</h3>
+                <p class="narrative-p">
+                    A instrução probatória do PAD revela-se uma ficção jurídica destituída de idoneidade. O rol de testemunhas que depuseram contra Márcio incorreu em patente **falso testemunho em bloco**, uma vez que **NENHUMA das testemunhas de acusação presenciou, ouviu ou esteve no recinto da cozinha da SEMEC** no momento do isolado atrito com Marcos. As únicas testemunhas oculares e reais do evento são as servidoras <strong>Maria Sélia Martins Lima das Neves</strong> (Matrícula nº 1.564) e <strong>Alzira Emília Fernandes Maia</strong> (Matrícula nº 14.341), as quais atestam a completa ausência de agressões ou ofensas por parte do Analista. A tipificação de infração disciplinar baseada exclusivamente em testemunhos de "ouvir dizer" (*hearsay evidence*) forjados por agentes interessados atrai a nulidade absoluta por vício de motivo e falsidade probatória ideológica.
+                </p>
+
+                <h3>3. Impedimento da Autoridade Julgadora de 2026</h3>
+                <p class="narrative-p">
+                    A reativação do feito no corrente ano de 2026 pela atual Prefeita Municipal, Sra. Élida Elena Moreira, perpetua o vício subjetivo de legalidade. Uma vez que a chefe do Executivo atua de forma combinada no interesse da perseguição política originária e figura como parte interessada e denunciante no histórico dos autos, carece de competência subjetiva para exarar o despacho de fls. 113, operando nulidade absoluta de seus atos.
+                </p>
+
+                <h3>4. Consumação Inconteste da Prescrição Intercorrente</h3>
+                <p class="narrative-p">
+                    O processo administrativo permaneceu abandonado e engavetado pela comissão processante entre <strong>setembro de 2022 e fevereiro de 2026</strong> — um hiato inercial de 3 anos e 7 meses. O transcurso desse lapso temporal sem qualquer ato de instrução legítimo ou portaria de prorrogação extinguiu definitivamente a pretensão punitiva do Estado, operando a perda irremediável do poder de punir administrativo.
+                </p>
+            </article>
+        </div>
+
+        <section class="flow-card">
+            <h2 class="section-title"><i class="fas fa-stream"></i> IV. Reconstituição Cronológica de Eventos</h2>
+            <div class="modern-timeline">
+                <div class="timeline-node danger">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="timeline-date">Julho / 2022</span>
+                        <span class="timeline-tag tag-danger">Gênese Persecutória</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Ativismo Digital e Ameaças do Prefeito</h4>
+                        <p>Márcio compartilha no status do WhatsApp denúncias do vereador Sharles Peixoto sobre superfaturamento do FestVerão. O Prefeito Jair Martins intercepta via prints, telefona para professora conhecida e profere ameaças agressivas direcionadas ao Analista.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-node warning">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="timeline-date">13/07/2022</span>
+                        <span class="timeline-tag tag-warning">Simulação de Infração</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Bloqueio de Férias e Desistência no Depoimento Policial</h4>
+                        <p>O servidor do RH Marcos tenta impor férias discriminatórias. Após vitória de Márcio, ocorre atrito profissional na cozinha. Marcos registra B.O., mas em seu depoimento formal na Delegacia de Polícia <strong>declara expressamente que aceitou desculpas e não deseja seguir criminalmente contra o Analista</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-node danger">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="timeline-date">21/07/2022</span>
+                        <span class="timeline-tag tag-danger">Vício de Impedimento Consumado</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Edição da Portaria nº 0132/2022 & Contaminação Familiar</h4>
+                        <p>Abertura do PAD enquadrando o servidor como Analista de Sistemas. Nomeação do julgador Neliton para a comissão, cuja irmã chefe, Nikole (inimiga declarada de Márcio), atua como falsa testemunha de acusação. Publicação corrompida no Diário Oficial.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-node danger">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="timeline-date">Agosto / 2022</span>
+                        <span class="timeline-tag tag-danger">Banimento Funcional</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Suspesão de 30 Dias e Exclusão na Sala Isolada</h4>
+                        <p>Após cumprir suspensão da CPAD, o Analista é removido da sala da DTI e colocado em uma sala isolada em ócio forçado crônico. Um funcionário de outra pasta assume suas funções de forma totalmente irregular.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-node danger">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="date-text">SET/2022 - FEV/2026</span>
+                        <span class="timeline-tag tag-danger">Abandono Processual</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Engavetamento Proposital por 3 Anos e 7 Meses</h4>
+                        <p>O processo é mantido oculto e paralisado pela comissão para prolongar o abalo psicológico do isolamento técnico. Configuração plena e irremediável da Prescrição Intercorrente.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-node success">
+                    <div class="timeline-indicator"></div>
+                    <div class="timeline-meta">
+                        <span class="timeline-date">22/04/2026</span>
+                        <span class="timeline-tag tag-success">Ato Viciado de Retomada</span>
+                    </div>
+                    <div class="timeline-content-box">
+                        <h4>Despacho de Reativação pela Prefeita Impedida</h4>
+                        <p>A Prefeita Élida Elena Moreira assina a decisão fls. 113 forçando a retomada dos atos sob a tese de "nulidade parcial" a partir da fl. 61, agindo em flagrante suspeição e impedimento.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="legal-panel" style="border-color: rgba(244, 63, 94, 0.2); background: linear-gradient(135deg, #090b16 0%, #05060f 100%);">
+            <h2 class="section-title" style="color: var(--red-primary); border-bottom-color: rgba(244, 63, 94, 0.2);"><i class="fas fa-shield-virus"></i> V. Matriz de Responsabilização: Crimes e Ilícitos das Comissões e Testemunhas</h2>
+            <p class="narrative-p" style="text-indent: 0; color: var(--text-secondary);">
+                A conduta comissiva e omissiva dos membros das Comissões Processantes de 2022 (Jayro, Neliton e Rosilândia), das comissões reativadas de 2026 e das falsas testemunhas (encabeçadas por Nikole) extrapola a mera irregularidade formal, amoldando-se perfeitamente a ilícitos civis, crimes tipificados no Código Penal e infrações administrativas gravíssimas.
+            </p>
+            
+            <div class="table-responsive">
+                <table class="law-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Agente / Polo</th>
+                            <th style="width: 25%;">Esfera Criminal (Código Penal)</th>
+                            <th style="width: 25%;">Esfera Cível (Lei nº 14.230/21)</th>
+                            <th style="width: 25%;">Esfera Administrativa (Estatuto)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Componentes da CPAD 2022</strong><br>(Jayro, Neliton, Rosilândia)</td>
+                            <td><strong>Prevaricação (Art. 319)</strong> pelo engavetamento doloso por 4 anos; <strong>Condescendência Criminosa (Art. 320)</strong>; <strong>Abuso de Autoridade (Lei 13.869/19)</strong> ao impor ócio forçado e manter julgador impedido (Neliton) sabendo do vínculo com a testemunha Nikole.</td>
+                            <td><strong>Improbidade Administrativa (Art. 11, Lei 8.429/42)</strong> por violação flagrante aos deveres de honestidade, imparcialidade, legalidade e lealdade às instituições públicas.</td>
+                            <td><strong>Demissão / Cassação de Aposentadoria</strong> por infração aos deveres de lealdade, moralidade e aplicação dolosa de perseguição, passível de instauração de PAD revisional contra os membros.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Componentes da CPAD 2026</strong><br>(Comissão Reativada)</td>
+                            <td><strong>Abuso de Autoridade (Art. 33 da Lei 13.869/19)</strong> ao dar prosseguimento a procedimento manifestamente prescrito e ciente do impedimento da Prefeita Élida Elena Moreira como autoridade ordenadora.</td>
+                            <td><strong>Ação Civil Pública de Reparação de Danos</strong> por danos morais coletivos e individuais causados ao erário ao manter o pagamento do Analista isolado sem contraprestação de suas funções.</td>
+                            <td><strong>Falta Funcional Grave</strong> por descumprimento do dever de subordinação à legalidade estrita e conluio na manutenção do assédio moral corporativo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Falsas Testemunhas de Acusação</strong><br>(Nikole e demais não oculares)</td>
+                            <td><strong>Falso Testemunho (Art. 342, §1º do CP)</strong>, crime de natureza formal punido com reclusão de 2 a 4 anos e multa, majorado por ter sido cometido no âmbito de Processo Administrativo Disciplinar. <strong>Denunciação Caluniosa (Art. 339)</strong>.</td>
+                            <td><strong>Responsabilidade Civil Coordenada (Art. 927 e 186, CC)</strong> com dever de indenizar financeiramente Márcio pelos danos morais, psíquicos e abalo à reputação funcional sofridos.</td>
+                            <td><strong>Demissão a Bem do Serviço Público</strong>, uma vez que a prática de crime contra a administração e a conduta escandalosa na repartição são causas expressas de desligamento estatutário.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="dashboard-section">
+            <h2 class="section-title" style="border-bottom-color: rgba(59, 130, 246, 0.2);"><i class="fas fa-chart-pie"></i> VI. Dashboard de Probabilidades & Auditoria de Riscos</h2>
+            <p style="text-indent: 0; color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
+                Indicadores estatísticos baseados no cruzamento de dados formais do processo e precedentes vinculantes do Supremo Tribunal Federal (STF).
+            </p>
+            
+            <div class="dashboard-grid">
+                <div class="dash-card">
+                    <div class="dash-card-title"><i class="fas fa-gauge-high" style="color: var(--red-primary);"></i> Chance de Extinção Judicial do PAD</div>
+                    <div class="radial-gauge-container">
+                        <div class="radial-gauge">
+                            <div class="gauge-arc-bg"></div>
+                            <div class="gauge-arc-fill"></div>
+                        </div>
+                        <div class="gauge-meta-value">95%</div>
+                        <span style="font-size: 0.72rem; color: var(--red-light); font-weight: 600; text-transform: uppercase; margin-top: 5px;">Risco Crítico de Anulação</span>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-title"><i class="fas fa-tasks" style="color: var(--blue-primary);"></i> Viabilidade de Sucesso por Tese</div>
+                    
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span class="metric-label">Prescrição Intercorrente Absoluta</span>
+                            <span class="metric-pct" style="color: var(--red-primary);">95%</span>
+                        </div>
+                        <div class="metric-progress-bar"><div class="metric-progress-fill" style="width: 95%; background: var(--red-primary);"></div></div>
+                    </div>
+
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span class="metric-label">Impedimento Consanguíneo (Neliton/Nikole)</span>
+                            <span class="metric-pct" style="color: var(--red-primary);">95%</span>
+                        </div>
+                        <div class="metric-progress-bar"><div class="metric-progress-fill" style="width: 95%; background: var(--red-primary);"></div></div>
+                    </div>
+
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span class="metric-label">Desvio de Finalidade (Retaliação)</span>
+                            <span class="metric-pct" style="color: var(--gold-primary);">90%</span>
+                        </div>
+                        <div class="metric-progress-bar"><div class="metric-progress-fill" style="width: 90%; background: var(--gold-primary);"></div></div>
+                    </div>
+
+                    <div class="metric-row">
+                        <div class="metric-info">
+                            <span class="metric-label">Inépcia Probatória (Falso Testemunho)</span>
+                            <span class="metric-pct" style="color: var(--blue-primary);">90%</span>
+                        </div>
+                        <div class="metric-progress-bar"><div class="metric-progress-fill" style="width: 90%; background: var(--blue-primary);"></div></div>
+                    </div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-title"><i class="fas fa-folder-open" style="color: var(--gold-primary);"></i> Mapeamento de Infrações do Ente</div>
+                    <div class="summary-legend-box" style="display: flex; flex-direction: column; gap: 10px;">
+                        <div class="legend-row">
+                            <div class="legend-left"><div class="legend-dot" style="background: var(--red-primary);"></div> Nulidades Constitucionais Absolutas</div>
+                            <div class="legend-right">04</div>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-left"><div class="legend-dot" style="background: var(--gold-primary);"></div> Evidências de Assédio / Crime</div>
+                            <div class="legend-right">06</div>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-left"><div class="legend-dot" style="background: var(--blue-primary);"></div> Vícios Formais de Publicidade</div>
+                            <div class="legend-right">02</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-footer-grid">
+                <div class="list-panel">
+                    <div class="dash-card-title" style="margin-bottom: 15px; color: var(--gold-primary);"><i class="fas fa-clipboard-list"></i> Pedidos Formulados em Defesa Prévia</div>
+                    
+                    <div class="pill-item danger-border">
+                        <div class="pill-number">1</div>
+                        <div class="pill-text">
+                            <h5>Arquivamento Mandatório do Processo</h5>
+                            <p>Reconhecimento fulminante da prescrição intercorrente devido ao abandono intencional do feito por 3 anos e 7 meses.</p>
+                        </div>
+                    </div>
+
+                    <div class="pill-item danger-border">
+                        <div class="pill-number">2</div>
+                        <div class="pill-text">
+                            <h5>Nulidade por Impedimento de Neliton dos Santos</h5>
+                            <p>Anulação de todos os atos da CPAD de 2022 ante a quebra do dever de impessoalidade por consanguinidade direta com a testemunha Nikole.</p>
+                        </div>
+                    </div>
+
+                    <div class="pill-item warning-border">
+                        <div class="pill-number">3</div>
+                        <div class="pill-text">
+                            <h5>Cessação Imediata do Confinamento em Sala</h5>
+                            <p>Ordem para imediata reintegração do Analista de Sistemas à sala física e rotina técnica da Diretoria de TI (DTI), encerrando o ócio forçado.</p>
+                        </div>
+                    </div>
+
+                    <div class="pill-item success-border">
+                        <div class="pill-number">4</div>
+                        <div class="pill-text">
+                            <h5>Extração de Peças ao Ministério Público (MPE)</h5>
+                            <p>Envio imediato dos autos ao MPE para apuração dos crimes de Falso Testemunho e Prevaricação cometidos pelos agentes indicados na matriz.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-panel" style="background: rgba(59,130,246,0.02); border-color: rgba(59,130,246,0.15);">
+                    <div class="dash-card-title" style="color: #93c5fd;"><i class="fas fa-shield-halved"></i> Plano de Ação Imediato</div>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); text-indent: 0; margin-bottom: 15px;">
+                        Roteiro defensivo de alta performance para a blindagem dos direitos funcionais do servidor estável:
+                    </p>
+                    <ul style="list-style: none; padding: 0; font-size: 0.82rem; color: var(--text-secondary);">
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; gap: 8px;"><i class="fas fa-check-double" style="color: var(--blue-primary); margin-top: 3px;"></i> Protocolar esta peça de Exceção de Nulidade Absoluta em até 10 dias úteis.</li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; gap: 8px;"><i class="fas fa-check-double" style="color: var(--blue-primary); margin-top: 3px;"></i> Arrolar unicamente Maria Sélia (Mat. 1.564) e Alzira Emília (Mat. 14.341) como testemunhas reais.</li>
+                        <li style="padding: 8px 0; display: flex; gap: 8px;"><i class="fas fa-check-double" style="color: var(--red-primary); margin-top: 3px;"></i> Havendo qualquer ato de indeferimento, impetrar imediatamente <strong>Mandado de Segurança Individual</strong> com pedido liminar.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="signature-block">
+            <div class="signature-line"></div>
+            <div class="signature-title">Núcleo de Proteção Constitucional ao Servidor Público</div>
+            <div class="signature-sub">Consultoria de Alta Performance em Direito Administrativo Sancionador</div>
+        </div>
+    </div>
+
+</body>
+</html>
